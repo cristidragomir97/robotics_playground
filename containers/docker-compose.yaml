@@ -1,4 +1,9 @@
-version: '2.1'
+version: '3.8'
+
+networks:
+  robot_network:
+    external: true
+
 
 volumes:
     ros-bin: 
@@ -17,6 +22,8 @@ services:
     volumes:
       - ros-bin:/opt/ros/noetic
       - boost-lib:/usr/include/boost
+    networks:
+      - robot_network
 
   ros-board:
     depends_on:
@@ -29,7 +36,8 @@ services:
       - "8888:8888"
     volumes:
       - ros-bin:/opt/ros/noetic
-
+    networks:
+      - robot_network
 
   motor-board:
     depends_on:
@@ -47,6 +55,9 @@ services:
       - /home/cdr/Robotics:/app/data:rw
     devices:
       - "/dev:/dev"
+    networks:
+      - robot_network
+
   imu:
     depends_on:
       - ros-core
@@ -60,23 +71,8 @@ services:
       - boost-lib:/usr/include/boost
     devices:
       - "/dev/i2c-1:/dev/i2c-1"
-
-
-  sensor-board:
-    depends_on:
-      - ros-core
-    privileged: true
-    build: ./rosserial
-    environment: 
-       - UDEV=1
-       - ROS_HOSTNAME=sensor-board
-       - ROS_MASTER_URI=http://ros-core:11311
-       - SERIAL_PORT=/dev/ttyUSB0
-    volumes:
-      - ros-bin:/opt/ros/noetic
-      - boost-lib:/usr/include/boost
-    devices:
-      - "/dev:/dev"
+    networks:
+      - robot_network
 
   ros-lidar:
     depends_on:
@@ -92,6 +88,8 @@ services:
       - boost-lib:/usr/include/boost
     devices:
       - "/dev:/dev"
+    networks:
+      - robot_network
 
   ros-joystick:
     depends_on:
@@ -106,4 +104,5 @@ services:
       - boost-lib:/usr/include/boost
     devices:
       - "/dev:/dev"
-    
+    networks:
+      - robot_network
